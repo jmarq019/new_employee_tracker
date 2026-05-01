@@ -18,13 +18,13 @@ VALUES ("sales manager", 50000, 1),
         ("product associate", 30000, 5);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
-VALUES ("joe", "dirt", 1, null),
-        ("lapili", "pilar", 2, null),
-        ("marissa", "monte", 3, null),
-        ("larissa", "lara", 4, null),
-        ("paul", "paulson", 5, null),
-        ("jesse", "price", 6, 1),
-        ("corona", "virus", 7, 2),
-        ("lavense", "lasmanos", 8, 3),
-        ("haganlo", "seguido", 9, 4),
-        ("virus", "corona", 10, 5);
+VALUES ("Marta", "Martínez", 1, null),
+        ("María del Pilar", "Hernández", 2, null),
+        ("Sebastián", "Ruiz", 3, null),
+        ("Guille", "Lara", 4, null),
+        ("Marco Antonio", "Arevalo", 5, null),
+        ("Orellana", "Campos", 6, 1),
+        ("Yurisleidis", "Rodríguez", 7, 2),
+        ("Joshua", "Lozano", 8, 3),
+        ("Ferdinando", "Suárez", 9, 4),
+        ("Karla Iberia", "Sánchez", 10, 5);
