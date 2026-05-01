@@ -19,7 +19,7 @@ router.get('/', (req, res) => {
 router.post('/', (req, res)=>{
     const query = 'INSERT INTO departments (name) VALUES (?)'
 
-    db.query(query, req.body.name, (err,data)=>{
+    db.query(query, [req.body.name], (err,data)=>{
         if(err){
             res.status(500).json({error:'you messed up'});
             return;
@@ -45,7 +45,7 @@ router.put('/:id', (req,res)=>{
 router.delete("/:id", (req, res)=>{
     const query = 'DELETE FROM departments WHERE id=?';
 
-    db.query(query, req.params.id, (err,data)=>{
+    db.query(query, [req.params.id], (err,data)=>{
         if(err){
             res.status(500).json({error:'you messed up'});
             return;

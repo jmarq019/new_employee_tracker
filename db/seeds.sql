@@ -14,7 +14,7 @@ VALUES ("sales manager", 50000, 1),
         ("sales associate", 20000, 1),
         ("junior dev", 30000, 2),
         ("support associate", 10000, 3),
-        ("markeint associate", 30000, 4),
+        ("marketing associate", 30000, 4),
         ("product associate", 30000, 5);
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)

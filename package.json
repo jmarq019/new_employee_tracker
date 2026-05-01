@@ -1,8 +1,16 @@
 {
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest --runInBand"
+  },
   "dependencies": {
     "express": "^4.17.1",
     "init": "^0.1.2",
     "inquirer": "^8.2.0",
     "mysql2": "^2.3.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
   }
 }
