@@ -1,6 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import pool from '@/lib/db';
 
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { title, salary, department_id } = await request.json();
+    const [result] = await pool.query(
+      'UPDATE roles SET title=?, salary=?, department_id=? WHERE id=?',
+      [title, salary, department_id, params.id]
+    );
+    return NextResponse.json(result);
+  } catch {
+    return NextResponse.json({ error: 'Failed to update role' }, { status: 500 });
+  }
+}
+
 export async function DELETE(
   _request: NextRequest,
   { params }: { params: { id: string } }

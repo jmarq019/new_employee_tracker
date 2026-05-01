@@ -1,46 +1,38 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getRoles, getEmployees } from '@/lib/api';
-import type { Employee, Role } from '@/lib/types';
+import { useState } from 'react';
+import type { Employee, Role, Department } from '@/lib/types';
 
 interface Props {
   initialData?: Employee | null;
   currentEmployeeId?: number;
+  employees: Employee[];
+  roles: Role[];
+  departments: Department[];
   onSubmit: (data: Omit<Employee, 'id' | 'role_title' | 'manager_name'>) => Promise<void>;
+  onClose: () => void;
 }
 
-export default function EmployeeForm({ initialData, currentEmployeeId, onSubmit }: Props) {
-  const [firstName, setFirstName] = useState(initialData?.first_name ?? '');
-  const [lastName, setLastName] = useState(initialData?.last_name ?? '');
+export default function EmployeeForm({ initialData, currentEmployeeId, employees, roles, departments, onSubmit, onClose }: Props) {
+  const [first, setFirst] = useState(initialData?.first_name ?? '');
+  const [last, setLast] = useState(initialData?.last_name ?? '');
   const [roleId, setRoleId] = useState(initialData?.role_id ? String(initialData.role_id) : '');
-  const [managerId, setManagerId] = useState(initialData?.manager_id ? String(initialData.manager_id) : 'none');
-  const [roles, setRoles] = useState<Role[]>([]);
-  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [managerId, setManagerId] = useState(initialData?.manager_id ? String(initialData.manager_id) : '');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    Promise.all([getRoles(), getEmployees()])
-      .then(([r, e]) => {
-        setRoles(r);
-        setEmployees(e.filter((emp) => emp.id !== currentEmployeeId));
-      })
-      .catch(() => {});
-  }, [currentEmployeeId]);
+  const validManagers = employees.filter(e => e.id !== currentEmployeeId);
+  const isEdit = !!initialData;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!first.trim() || !last.trim()) return;
     setLoading(true);
     try {
       await onSubmit({
-        first_name: firstName,
-        last_name: lastName,
-        role_id: roleId ? Number(roleId) : null,
-        manager_id: managerId === 'none' ? null : Number(managerId),
+        first_name: first.trim(),
+        last_name:  last.trim(),
+        role_id:    roleId    === '' ? null : Number(roleId),
+        manager_id: managerId === '' ? null : Number(managerId),
       });
     } finally {
       setLoading(false);
@@ -48,63 +40,46 @@ export default function EmployeeForm({ initialData, currentEmployeeId, onSubmit 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="emp-first">First Name</Label>
-          <Input
-            id="emp-first"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            placeholder="Jane"
-            required
-          />
+    <>
+      <form id="emp-form" onSubmit={handleSubmit} className="dialog-body">
+        <div className="field-row">
+          <div className="field">
+            <label htmlFor="emp-first">First name</label>
+            <input id="emp-first" autoFocus value={first} onChange={e => setFirst(e.target.value)} placeholder="Jane" required />
+          </div>
+          <div className="field">
+            <label htmlFor="emp-last">Last name</label>
+            <input id="emp-last" value={last} onChange={e => setLast(e.target.value)} placeholder="Doe" required />
+          </div>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="emp-last">Last Name</Label>
-          <Input
-            id="emp-last"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            placeholder="Doe"
-            required
-          />
+        <div className="field">
+          <label htmlFor="emp-role">Role</label>
+          <select id="emp-role" value={roleId} onChange={e => setRoleId(e.target.value)}>
+            <option value="">— Select a role —</option>
+            {roles.map(r => {
+              const dept = departments.find(d => d.id === r.department_id);
+              return <option key={r.id} value={r.id}>{r.title} · {dept?.name ?? ''}</option>;
+            })}
+          </select>
+          <div className="field-hint">Determines title and department.</div>
         </div>
-      </div>
-      <div className="space-y-2">
-        <Label>Role</Label>
-        <Select value={roleId} onValueChange={setRoleId}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a role" />
-          </SelectTrigger>
-          <SelectContent>
-            {roles.map((r) => (
-              <SelectItem key={r.id} value={String(r.id)}>
-                {r.title}
-              </SelectItem>
+        <div className="field">
+          <label htmlFor="emp-mgr">Manager</label>
+          <select id="emp-mgr" value={managerId} onChange={e => setManagerId(e.target.value)}>
+            <option value="">No manager</option>
+            {validManagers.map(emp => (
+              <option key={emp.id} value={emp.id}>{emp.first_name} {emp.last_name}</option>
             ))}
-          </SelectContent>
-        </Select>
+          </select>
+          <div className="field-hint">Leave blank if this person reports to nobody.</div>
+        </div>
+      </form>
+      <div className="dialog-footer">
+        <button type="button" className="btn" onClick={onClose}>Cancel</button>
+        <button type="submit" form="emp-form" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Saving…' : isEdit ? 'Save changes' : 'Create employee'}
+        </button>
       </div>
-      <div className="space-y-2">
-        <Label>Manager</Label>
-        <Select value={managerId} onValueChange={setManagerId}>
-          <SelectTrigger>
-            <SelectValue placeholder="No manager" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">No manager</SelectItem>
-            {employees.map((emp) => (
-              <SelectItem key={emp.id} value={String(emp.id)}>
-                {emp.first_name} {emp.last_name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? 'Saving…' : initialData ? 'Save Changes' : 'Create Employee'}
-      </Button>
-    </form>
+    </>
   );
 }

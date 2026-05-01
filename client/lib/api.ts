@@ -27,6 +27,8 @@ export const deleteDepartment = (id: number) =>
 export const getRoles = () => apiFetch<Role[]>('/api/roles');
 export const createRole = (data: Omit<Role, 'id' | 'department_name'>) =>
   apiFetch('/api/roles', { method: 'POST', ...json(data) });
+export const updateRole = (id: number, data: Omit<Role, 'id' | 'department_name'>) =>
+  apiFetch(`/api/roles/${id}`, { method: 'PUT', ...json(data) });
 export const deleteRole = (id: number) =>
   apiFetch(`/api/roles/${id}`, { method: 'DELETE' });
 
