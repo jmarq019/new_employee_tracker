@@ -1,6 +1,6 @@
 # Employee Tracker
 
-A full-stack employee management app for tracking people, roles, and departments — with an org chart, bulk actions, and a command palette.
+A full-stack employee management app for tracking people, roles, and departments — with an org chart, bulk actions, and a command palette. The application is deployed through Vercel and it can be accessed [here](https://new-employee-tracker.vercel.app/employees)
 
 ## Stack
 
